@@ -1,0 +1,14 @@
+# Ignorar node_modules e build
+node_modules/
+dist/
+build/
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.prodution
+
+# Logs
+*.Logs
+logs/
+npm-debug.log*
