@@ -1,11 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const {
   getAllTodos,
   createTodo,
   updateTodo,
-  deleteTodo
-} = require('../controllers/todoController');
+  deleteTodo,
+} = require("../controllers/todoController");
+
+const Todo = require("../models/todo");
 
 /**
  * @swagger
@@ -44,7 +46,7 @@ const {
  *               items:
  *                 $ref: '#/components/schemas/Todo'
  */
-router.get('/', getAllTodos);
+router.get("/", getAllTodos);
 
 /**
  * @swagger
@@ -61,7 +63,7 @@ router.get('/', getAllTodos);
  *       201:
  *         description: Tarefa criada
  */
-router.post('/create', createTodo);
+router.post("/create", createTodo);
 
 /**
  * @swagger
@@ -83,7 +85,29 @@ router.post('/create', createTodo);
  *       200:
  *         description: Tarefa atualizada
  */
-router.put('/update/:id', updateTodo);
+
+router.get("/:id", async (req, res) => {
+  try {
+    const task = await Todo.findById(req.params.id);
+    if (!task) return res.status(404).json({ error: "Tarefa não encontrada" });
+
+    res.json({
+      _id: task._id,
+      title: task.title,
+      description: task.description,
+      dueDate: task.dueDate,
+      status: task.done ? "concluído" : "pendente",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Erro ao buscar tarefa" });
+  }
+});
+
+router.get("/", getAllTodos);
+router.post("/create", createTodo);
+router.put("/update/:id", updateTodo);
+router.delete("/delete/:id", deleteTodo);
 
 /**
  * @swagger
@@ -100,6 +124,6 @@ router.put('/update/:id', updateTodo);
  *       200:
  *         description: Tarefa deletada
  */
-router.delete('/delete/:id', deleteTodo);
+router.delete("/delete/:id", deleteTodo);
 
 module.exports = router;
